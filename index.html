@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brightcove Player Mid-Roll</title>
+    <style>
+        /* * The body style is just for the
+        * background color of the codepen.
+        * Do not include in your code.
+        */
+        body {
+        background-color: #efefef;
+        color: #fff;
+        }
+        /*
+        * Styles essential to the sample
+        * are below
+        */
+        .video-js {
+        width: 640px;
+        height: 360px;
+        }
+    </style>
+</head>
+<body>
+
+    
+    <div id="placeHolder"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        var myPlayer,
+        playerHTML,
+        playerId,
+        // +++ Set the data for the player +++
+        
+        playerData = {
+            accountId: "3971130171001",
+            player1: "mkn1t5sda",
+            player2: "kr1cZV8I4",
+            videoId: "6172021810001"
+        };
+
+        var qURL = window.location.href;
+        var qparam = getUrlParameter(qURL);
+        if(qparam !== undefined){
+            var midroll = qparam['cookie'];
+            if (midroll == "true") {
+                playerId = playerData.player2;
+            }
+        }else{
+            playerId = playerData.player1;
+        }              
+
+        // +++ Build the player and place in HTML DOM +++
+        function addPlayer() {
+        // Dynamically build the player video element
+        playerHTML =
+            '<video-js id="myPlayerID" data-video-id="' +
+            playerData.videoId +
+            '"  data-account="' +
+            playerData.accountId +
+            '" data-player="' +
+            playerId +
+            '" data-embed="default" class="video-js" controls></video-js>';
+        // Inject the player code into the DOM
+        document.getElementById("placeHolder").innerHTML = playerHTML;
+        // Add and execute the player script tag
+        var s = document.createElement("script");
+        s.src =
+            "https://players.brightcove.net/" +
+            playerData.accountId +
+            "/" +
+            playerId +
+            "_default/index.min.js";
+        // Add the script tag to the document
+        document.body.appendChild(s);
+        // Call a function to play the video once player's JavaScropt loaded
+        s.onload = callback;
+        }
+
+        // +++ Initialize the player and start the video +++
+        function callback() {
+        myPlayer = bc("myPlayerID");
+        // Can also use the following to assign a player instance to the variable if you choose not to use IDs for elements directly
+        // myPlayer = bc(document.getElementById('myPlayerID'));
+        myPlayer.on("loadedmetadata", function() {
+            // Mute the audio track, if there is one, so video will autoplay on button click
+            myPlayer.muted(true);
+            myPlayer.play();
+        });
+        }
+
+        function getUrlParameter(qURL) {
+            var url = qURL;
+            var vars = {};
+            var hashes = url.split("?")[1];
+            if(hashes !== undefined){
+                var hash = hashes.split('&');
+                for (var i = 0; i < hash.length; i++) {
+                    params=hash[i].split("=");
+                    vars[params[0]] = params[1];
+                }
+                return vars;
+            }
+        }       
+
+
+        $(document).ready(function(){
+            addPlayer();
+        })
+    </script>
+</body>
+</html>
